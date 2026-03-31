@@ -11,17 +11,20 @@ export async function POST(request: Request) {
     }
 
     // Check env var first, then DB setting
-    let correctPassword = process.env.ADMIN_PASSWORD;
+    const envPassword = process.env.ADMIN_PASSWORD?.trim();
 
-    if (!correctPassword) {
-      const row = await getDb().execute({
-        sql: "SELECT value FROM settings WHERE key = ?",
-        args: ["admin_password"],
-      });
-      correctPassword = row.rows[0]?.value as string | undefined;
+    if (envPassword && password === envPassword) {
+      return Response.json({ success: true });
     }
 
-    if (password === correctPassword) {
+    // Fallback: check DB
+    const row = await getDb().execute({
+      sql: "SELECT value FROM settings WHERE key = ?",
+      args: ["admin_password"],
+    });
+    const dbPassword = (row.rows[0]?.value as string)?.trim();
+
+    if (dbPassword && password === dbPassword) {
       return Response.json({ success: true });
     }
 
