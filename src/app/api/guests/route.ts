@@ -21,7 +21,9 @@ export async function GET() {
     return Response.json(guests);
   } catch (error) {
     console.error("GET /api/guests error:", error);
-    return Response.json({ error: "Error al obtener invitados" }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Error al obtener invitados";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
@@ -56,7 +58,9 @@ export async function POST(request: Request) {
     return Response.json(guest, { status: 201 });
   } catch (error) {
     console.error("POST /api/guests error:", error);
-    return Response.json({ error: "Error al crear invitado" }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Error al crear invitado";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 

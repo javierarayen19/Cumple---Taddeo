@@ -4,8 +4,12 @@ let client: Client | null = null;
 
 export function getDb(): Client {
   if (!client) {
+    const url = process.env.TURSO_DATABASE_URL;
+    if (!url) {
+      throw new Error("TURSO_DATABASE_URL no está configurada en las variables de entorno");
+    }
     client = createClient({
-      url: process.env.TURSO_DATABASE_URL!,
+      url,
       authToken: process.env.TURSO_AUTH_TOKEN,
     });
   }
