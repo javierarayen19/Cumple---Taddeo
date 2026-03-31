@@ -8,23 +8,8 @@ import GuestList from "@/components/GuestList";
 import StatsBar from "@/components/StatsBar";
 
 export default function Home() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
-  const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
-
   const [guests, setGuests] = useState<Guest[]>([]);
-  const [loadingGuests, setLoadingGuests] = useState(false);
-
-  // Check sessionStorage on mount
-  useEffect(() => {
-    const session = sessionStorage.getItem("admin_auth");
-    if (session === "true") {
-      setAuthenticated(true);
-    }
-    setCheckingSession(false);
-  }, []);
+  const [loadingGuests, setLoadingGuests] = useState(true);
 
   // Fetch guests
   const fetchGuests = useCallback(async () => {
@@ -43,46 +28,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (authenticated) {
-      fetchGuests();
-    }
-  }, [authenticated, fetchGuests]);
-
-  // Login handler
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    if (!password.trim()) return;
-
-    setLoginLoading(true);
-    setLoginError("");
-
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      if (res.ok) {
-        sessionStorage.setItem("admin_auth", "true");
-        setAuthenticated(true);
-      } else {
-        setLoginError("Contraseña incorrecta");
-      }
-    } catch {
-      setLoginError("Error de conexion");
-    } finally {
-      setLoginLoading(false);
-    }
-  }
-
-  // Logout
-  function handleLogout() {
-    sessionStorage.removeItem("admin_auth");
-    setAuthenticated(false);
-    setPassword("");
-    setGuests([]);
-  }
+    fetchGuests();
+  }, [fetchGuests]);
 
   // Delete guest
   async function handleDelete(id: string) {
@@ -94,67 +41,6 @@ export default function Home() {
     } catch {
       // silently fail
     }
-  }
-
-  // Loading check
-  if (checkingSession) {
-    return (
-      <div className="flex flex-1 items-center justify-center min-h-screen">
-        <Sparkles />
-        <p className="text-foreground/50 font-medium text-lg animate-pulse">Cargando...</p>
-      </div>
-    );
-  }
-
-  // Login screen
-  if (!authenticated) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center min-h-screen px-4 relative">
-        <Sparkles />
-
-        <div className="relative z-10 w-full max-w-sm space-y-8 text-center">
-          {/* Monster icon */}
-          <div className="monster-bounce inline-block text-7xl">👾</div>
-
-          <div>
-            <h1 className="font-display text-3xl font-bold text-shimmer">
-              Cumple de Taddeo
-            </h1>
-            <p className="text-foreground/50 mt-2 font-medium">
-              Panel de Administracion
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} className="card-glow rounded-2xl p-6 space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground/70 mb-1 text-left">
-                Contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Ingresa la contraseña..."
-                className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-            </div>
-
-            {loginError && (
-              <p className="text-accent-pink text-sm font-medium">{loginError}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loginLoading || !password.trim()}
-              className="w-full rounded-xl bg-gradient-to-r from-primary-dark to-primary py-3 px-6 font-bold text-background text-lg transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 glow-pulse"
-            >
-              {loginLoading ? "Verificando..." : "🎵 Entrar"}
-            </button>
-          </form>
-        </div>
-      </div>
-    );
   }
 
   // Main admin panel
@@ -186,12 +72,6 @@ export default function Home() {
             <span className="rounded-xl bg-secondary/20 border border-secondary/30 px-4 py-2 text-sm font-bold text-secondary">
               🎤 Invitados
             </span>
-            <button
-              onClick={handleLogout}
-              className="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground/60 hover:border-accent-pink hover:text-accent-pink transition-all"
-            >
-              Salir
-            </button>
           </nav>
         </div>
       </header>
