@@ -1,11 +1,11 @@
-import db, { initDB } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 // GET — return all settings as a key-value object
 export async function GET() {
   try {
-    await initDB();
+    await initDb();
 
-    const result = await db.execute("SELECT key, value FROM settings");
+    const result = await getDb().execute("SELECT key, value FROM settings");
 
     const settings: Record<string, string> = {};
     for (const row of result.rows) {
@@ -22,7 +22,7 @@ export async function GET() {
 // PATCH — update one or more settings
 export async function PATCH(request: Request) {
   try {
-    await initDB();
+    await initDb();
 
     const updates: Record<string, string> = await request.json();
 
@@ -31,7 +31,7 @@ export async function PATCH(request: Request) {
     }
 
     for (const [key, value] of Object.entries(updates)) {
-      await db.execute({
+      await getDb().execute({
         sql: "UPDATE settings SET value = ? WHERE key = ?",
         args: [value, key],
       });

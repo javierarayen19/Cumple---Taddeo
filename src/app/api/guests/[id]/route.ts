@@ -1,4 +1,4 @@
-import db, { initDB } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 // PATCH — confirm or decline a guest
 export async function PATCH(
@@ -6,13 +6,13 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await initDB();
+    await initDb();
 
     const { id } = await params;
     const { action, decline_reason } = await request.json();
 
     if (action === "confirm") {
-      const result = await db.execute({
+      const result = await getDb().execute({
         sql: "UPDATE guests SET confirmed = 1, declined = 0, decline_reason = '' WHERE id = ?",
         args: [id],
       });
@@ -25,7 +25,7 @@ export async function PATCH(
     }
 
     if (action === "decline") {
-      const result = await db.execute({
+      const result = await getDb().execute({
         sql: "UPDATE guests SET declined = 1, confirmed = 0, decline_reason = ? WHERE id = ?",
         args: [decline_reason?.trim() ?? "", id],
       });

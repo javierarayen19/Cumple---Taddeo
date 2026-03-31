@@ -1,12 +1,12 @@
 import { type NextRequest } from "next/server";
-import db, { initDB } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 // GET — return all guests
 export async function GET() {
   try {
-    await initDB();
+    await initDb();
 
-    const result = await db.execute("SELECT * FROM guests ORDER BY created_at DESC");
+    const result = await getDb().execute("SELECT * FROM guests ORDER BY created_at DESC");
 
     const guests = result.rows.map((row) => ({
       id: row.id,
@@ -28,7 +28,7 @@ export async function GET() {
 // POST — create a new guest
 export async function POST(request: Request) {
   try {
-    await initDB();
+    await initDb();
 
     const { name, allergies } = await request.json();
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     const id = crypto.randomUUID();
 
-    await db.execute({
+    await getDb().execute({
       sql: "INSERT INTO guests (id, name, allergies) VALUES (?, ?, ?)",
       args: [id, name.trim(), allergies?.trim() ?? ""],
     });
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 // DELETE — remove a guest by query param ?id=...
 export async function DELETE(request: NextRequest) {
   try {
-    await initDB();
+    await initDb();
 
     const id = request.nextUrl.searchParams.get("id");
 
@@ -71,7 +71,7 @@ export async function DELETE(request: NextRequest) {
       return Response.json({ error: "Se requiere el id del invitado" }, { status: 400 });
     }
 
-    const result = await db.execute({
+    const result = await getDb().execute({
       sql: "DELETE FROM guests WHERE id = ?",
       args: [id],
     });

@@ -1,8 +1,8 @@
-import db, { initDB } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    await initDB();
+    await initDb();
 
     const { password } = await request.json();
 
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     let correctPassword = process.env.ADMIN_PASSWORD;
 
     if (!correctPassword) {
-      const row = await db.execute({
+      const row = await getDb().execute({
         sql: "SELECT value FROM settings WHERE key = ?",
         args: ["admin_password"],
       });

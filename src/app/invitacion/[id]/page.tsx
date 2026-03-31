@@ -1,4 +1,4 @@
-import db, { initDB } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 import InvitationClient from "./InvitationClient";
 
@@ -9,10 +9,10 @@ interface Props {
 export default async function InvitacionPage({ params }: Props) {
   const { id } = await params;
 
-  await initDB();
+  await initDb();
 
   // Fetch guest
-  const guestRow = await db.execute({
+  const guestRow = await getDb().execute({
     sql: "SELECT id, name, allergies, confirmed, declined, decline_reason FROM guests WHERE id = ?",
     args: [id],
   });
@@ -45,7 +45,7 @@ export default async function InvitacionPage({ params }: Props) {
   };
 
   // Fetch party settings
-  const settingsRows = await db.execute(
+  const settingsRows = await getDb().execute(
     "SELECT key, value FROM settings WHERE key IN ('party_date', 'party_time', 'party_location')"
   );
 

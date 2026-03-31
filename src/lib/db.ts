@@ -1,11 +1,16 @@
-import { createClient } from "@libsql/client";
+import { createClient, type Client } from "@libsql/client";
 
-const db = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+let client: Client | null = null;
 
-export default db;
+export function getDb(): Client {
+  if (!client) {
+    client = createClient({
+      url: process.env.TURSO_DATABASE_URL!,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+  }
+  return client;
+}
 
 // ---------------------------------------------------------------------------
 // Schema initialisation — called once on first request
@@ -13,27 +18,30 @@ export default db;
 
 let initialised = false;
 
-export async function initDB() {
+export async function initDb() {
   if (initialised) return;
+  const db = getDb();
 
-  await db.executeMultiple(`
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS guests (
       id          TEXT PRIMARY KEY,
       name        TEXT NOT NULL,
-      allergies   TEXT DEFAULT '',
-      confirmed   INTEGER DEFAULT 0,
-      declined    INTEGER DEFAULT 0,
-      decline_reason TEXT DEFAULT '',
-      created_at  TEXT DEFAULT (datetime('now'))
-    );
+      allergies   TEXT NOT NULL DEFAULT '',
+      confirmed   INTEGER NOT NULL DEFAULT 0,
+      declined    INTEGER NOT NULL DEFAULT 0,
+      decline_reason TEXT NOT NULL DEFAULT '',
+      created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
 
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS settings (
       key   TEXT PRIMARY KEY,
       value TEXT NOT NULL
-    );
+    )
   `);
 
-  // Seed default settings (INSERT OR IGNORE so existing values are kept)
+  // Seed default settings
   const defaults: [string, string][] = [
     ["notification_email", ""],
     ["party_date", ""],
