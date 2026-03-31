@@ -1,19 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-/* ===== Theme Variables ===== */
+/* ===== Theme Variables — My Singing Monsters Palette ===== */
 :root {
-  --background: #1a0a2e;
-  --foreground: #f0e6ff;
-  --primary: #4ade80;
-  --primary-dark: #22c55e;
-  --secondary: #a855f7;
-  --accent-orange: #fb923c;
-  --accent-pink: #f472b6;
-  --accent-blue: #60a5fa;
-  --accent-yellow: #fbbf24;
-  --surface: rgba(255, 255, 255, 0.05);
-  --border: rgba(255, 255, 255, 0.1);
+  --background: #1a3a1a;
+  --foreground: #fff8e7;
+  --primary: #7ec636;
+  --primary-dark: #5da328;
+  --secondary: #f5a623;
+  --accent-orange: #e8801e;
+  --accent-pink: #e85d9a;
+  --accent-blue: #4fc3f7;
+  --accent-yellow: #ffd740;
+  --accent-lime: #a8e63e;
+  --surface: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.12);
 }
 
 /* ===== Tailwind Theme Integration ===== */
@@ -27,9 +28,10 @@
   --color-accent-pink: var(--accent-pink);
   --color-accent-blue: var(--accent-blue);
   --color-accent-yellow: var(--accent-yellow);
+  --color-accent-lime: var(--accent-lime);
   --color-surface: var(--surface);
   --color-border: var(--border);
-  --font-display: "Fredoka", sans-serif;
+  --font-display: "Luckiest Guy", "Fredoka", cursive;
   --font-body: "Nunito", sans-serif;
 }
 
@@ -44,7 +46,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Fredoka", sans-serif;
+  font-family: "Luckiest Guy", "Fredoka", cursive;
+  letter-spacing: 0.02em;
 }
 
 /* ===== Noise Overlay ===== */
@@ -75,8 +78,8 @@ body::before {
     90deg,
     var(--primary) 0%,
     var(--accent-yellow) 25%,
-    var(--accent-pink) 50%,
-    var(--secondary) 75%,
+    var(--secondary) 50%,
+    var(--accent-lime) 75%,
     var(--primary) 100%
   );
   background-size: 200% auto;
@@ -155,9 +158,9 @@ body::before {
   background: linear-gradient(
     135deg,
     var(--primary),
+    var(--accent-yellow),
     var(--secondary),
-    var(--accent-pink),
-    var(--accent-orange)
+    var(--accent-lime)
   );
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
@@ -173,8 +176,8 @@ body::before {
 
 .card-glow:hover {
   box-shadow:
-    0 0 20px rgba(74, 222, 128, 0.15),
-    0 0 40px rgba(168, 85, 247, 0.1);
+    0 0 20px rgba(126, 198, 54, 0.2),
+    0 0 40px rgba(245, 166, 35, 0.15);
   border-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -182,13 +185,13 @@ body::before {
 @keyframes glow-pulse {
   0%, 100% {
     box-shadow:
-      0 0 8px rgba(74, 222, 128, 0.4),
-      0 0 20px rgba(74, 222, 128, 0.2);
+      0 0 8px rgba(126, 198, 54, 0.4),
+      0 0 20px rgba(126, 198, 54, 0.2);
   }
   50% {
     box-shadow:
-      0 0 16px rgba(74, 222, 128, 0.6),
-      0 0 40px rgba(74, 222, 128, 0.3);
+      0 0 16px rgba(126, 198, 54, 0.6),
+      0 0 40px rgba(245, 166, 35, 0.3);
   }
 }
 
@@ -198,5 +201,15 @@ body::before {
 
 /* ===== Utility: gradient backgrounds ===== */
 .bg-monster-gradient {
-  background: linear-gradient(135deg, var(--background) 0%, #2d1452 50%, #1a0a2e 100%);
+  background: linear-gradient(135deg, #1a3a1a 0%, #2a4e1a 30%, #1e4428 60%, #1a3a1a 100%);
+}
+
+/* ===== MSM Title style — bubbly outline text ===== */
+.msm-title {
+  text-shadow:
+    3px 3px 0 var(--accent-orange),
+    -1px -1px 0 var(--accent-orange),
+    1px -1px 0 var(--accent-orange),
+    -1px 1px 0 var(--accent-orange),
+    0 3px 6px rgba(0, 0, 0, 0.3);
 }

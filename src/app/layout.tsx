@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
+import { Fredoka, Nunito, Luckiest_Guy } from "next/font/google";
 import "./globals.css";
+
+const luckiestGuy = Luckiest_Guy({
+  variable: "--font-luckiest",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
 
 const fredoka = Fredoka({
   variable: "--font-fredoka",
@@ -30,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${fredoka.variable} ${nunito.variable} h-full antialiased`}
+      className={`${luckiestGuy.variable} ${fredoka.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] font-[var(--font-body)]">
         {children}

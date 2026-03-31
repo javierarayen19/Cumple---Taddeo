@@ -110,15 +110,15 @@ export default function InvitationClient({
       {/* Background gradient blurs */}
       <div
         className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-20 blur-[120px] pointer-events-none"
-        style={{ background: "var(--secondary)" }}
-      />
-      <div
-        className="fixed bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full opacity-15 blur-[100px] pointer-events-none"
         style={{ background: "var(--primary)" }}
       />
       <div
+        className="fixed bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full opacity-15 blur-[100px] pointer-events-none"
+        style={{ background: "var(--secondary)" }}
+      />
+      <div
         className="fixed top-[40%] left-[60%] w-[300px] h-[300px] rounded-full opacity-10 blur-[80px] pointer-events-none"
-        style={{ background: "var(--accent-pink)" }}
+        style={{ background: "var(--accent-yellow)" }}
       />
 
       {/* Floating musical notes */}
@@ -139,38 +139,66 @@ export default function InvitationClient({
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-4 py-8 max-w-lg mx-auto">
-        {/* Section 1 — Welcome splash */}
+        {/* Section 1 — Guest greeting (arriba de todo) */}
         <section
           className={`w-full text-center mb-6 transition-all duration-700 ease-out ${
             isVisible(0) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="text-6xl mb-4 monster-bounce">🎵👾</div>
-          <p
-            className="text-xl font-[var(--font-body)] font-semibold tracking-wide"
-            style={{ color: "var(--foreground)", opacity: 0.85 }}
-          >
-            Estas invitado/a a...
-          </p>
+          <div className="card-glow p-6">
+            <div className="text-5xl mb-3 monster-bounce">🥳</div>
+            <h2
+              className="font-[var(--font-display)] text-3xl sm:text-4xl font-bold mb-3"
+              style={{ color: "var(--accent-pink)" }}
+            >
+              Hola {guest.name}!
+            </h2>
+
+            {guest.allergies && (
+              <div
+                className="rounded-xl p-3 mb-4 text-sm"
+                style={{
+                  background: "rgba(251, 146, 60, 0.15)",
+                  border: "1px solid var(--accent-orange)",
+                }}
+              >
+                <span className="font-bold" style={{ color: "var(--accent-orange)" }}>
+                  ⚠️ Alergias registradas:
+                </span>{" "}
+                {guest.allergies}
+              </div>
+            )}
+
+            <p className="text-lg" style={{ color: "var(--foreground)", opacity: 0.9 }}>
+              ¡Prepárate para cantar, jugar y pasarla increíble! 🎶
+            </p>
+          </div>
         </section>
 
-        {/* Section 2 — Main title */}
+        {/* Section 2 — Welcome + Title */}
         <section
           className={`w-full text-center mb-8 transition-all duration-700 ease-out ${
             isVisible(1) ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-90"
           }`}
         >
-          <h1 className="font-[var(--font-display)] text-5xl sm:text-6xl font-bold text-shimmer leading-tight mb-3">
-            El Cumple de TADDEO
+          <p
+            className="text-xl font-[var(--font-body)] font-semibold tracking-wide mb-4"
+            style={{ color: "var(--foreground)", opacity: 0.85 }}
+          >
+            Estás invitado/a a...
+          </p>
+          <h1 className="font-[var(--font-display)] text-5xl sm:text-6xl font-bold leading-tight mb-3 msm-title"
+            style={{ color: "var(--accent-lime)" }}>
+            Cumple de TADDEO
           </h1>
           <div
             className={`inline-block ${isVisible(1) ? "monster-bounce" : ""}`}
           >
             <span
-              className="text-3xl sm:text-4xl font-[var(--font-display)] font-bold"
+              className="text-3xl sm:text-4xl font-[var(--font-display)] font-bold msm-title"
               style={{ color: "var(--accent-yellow)" }}
             >
-              Cumple 9 anos!
+              ¡Cumple 9 años!
             </span>
           </div>
           {/* Monster decorative row */}
@@ -249,42 +277,7 @@ export default function InvitationClient({
           </div>
         </section>
 
-        {/* Section 4 — Guest greeting */}
-        <section
-          className={`w-full text-center mb-8 transition-all duration-700 ease-out ${
-            isVisible(3) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="card-glow p-6">
-            <h2
-              className="font-[var(--font-display)] text-3xl sm:text-4xl font-bold mb-3"
-              style={{ color: "var(--accent-pink)" }}
-            >
-              Hola {guest.name}! 🥳
-            </h2>
-
-            {guest.allergies && (
-              <div
-                className="rounded-xl p-3 mb-4 text-sm"
-                style={{
-                  background: "rgba(251, 146, 60, 0.15)",
-                  border: "1px solid var(--accent-orange)",
-                }}
-              >
-                <span className="font-bold" style={{ color: "var(--accent-orange)" }}>
-                  ⚠️ Alergias registradas:
-                </span>{" "}
-                {guest.allergies}
-              </div>
-            )}
-
-            <p className="text-lg" style={{ color: "var(--foreground)", opacity: 0.9 }}>
-              Preparate para cantar, jugar y pasarla increible! 🎶
-            </p>
-          </div>
-        </section>
-
-        {/* Section 5 — RSVP buttons */}
+        {/* Section 4 — RSVP buttons */}
         <section
           className={`w-full mb-8 transition-all duration-700 ease-out ${
             isVisible(4) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -330,7 +323,7 @@ export default function InvitationClient({
                   <textarea
                     value={declineReason}
                     onChange={(e) => setDeclineReason(e.target.value)}
-                    placeholder="Contanos por que no podes venir (opcional)"
+                    placeholder="Cuéntanos por qué no puedes venir (opcional)"
                     rows={3}
                     className="w-full rounded-xl p-3 mb-3 text-sm resize-none"
                     style={{
@@ -389,10 +382,10 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--primary)" }}
               >
-                Confirmado! Te esperamos!
+                ¡Confirmado! ¡Te esperamos!
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                Va a estar genial! 🎵👾🎶
+                ¡Va a estar genial! 🎵👾🎶
               </p>
             </div>
           )}
@@ -404,10 +397,10 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--accent-pink)" }}
               >
-                Que pena que no puedas venir
+                ¡Qué pena que no puedas venir!
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                Te vamos a extranar! 🎵
+                ¡Te vamos a extrañar! 🎵
               </p>
             </div>
           )}

@@ -6,6 +6,7 @@ import Sparkles from "@/components/Sparkles";
 import GuestForm from "@/components/GuestForm";
 import GuestList from "@/components/GuestList";
 import StatsBar from "@/components/StatsBar";
+import PartySettings from "@/components/PartySettings";
 
 export default function Home() {
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -80,6 +81,9 @@ export default function Home() {
       <main className="relative z-10 flex-1 mx-auto w-full max-w-6xl px-4 py-8 space-y-8">
         {/* Stats */}
         <StatsBar guests={guests} />
+
+        {/* Party Settings */}
+        <PartySettings />
 
         {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
