@@ -62,6 +62,13 @@ export default function InvitationClient({
     return () => timers.forEach((t) => clearTimeout(t));
   }, []);
 
+  const sendWhatsAppNotification = (whatsappUrl: string) => {
+    if (whatsappUrl) {
+      // Open WhatsApp in new tab to send notification to admin
+      window.open(whatsappUrl, "_blank");
+    }
+  };
+
   const handleConfirm = async () => {
     setIsSubmitting(true);
     try {
@@ -71,8 +78,12 @@ export default function InvitationClient({
         body: JSON.stringify({ action: "confirm" }),
       });
       if (res.ok) {
+        const data = await res.json();
         setStatus("confirmed");
         setJustConfirmed(true);
+        if (data.whatsappUrl) {
+          sendWhatsAppNotification(data.whatsappUrl);
+        }
       }
     } catch {
       alert("Hubo un error, intenta de nuevo");
@@ -94,7 +105,11 @@ export default function InvitationClient({
         body: JSON.stringify({ action: "decline", decline_reason: declineReason }),
       });
       if (res.ok) {
+        const data = await res.json();
         setStatus("declined");
+        if (data.whatsappUrl) {
+          sendWhatsAppNotification(data.whatsappUrl);
+        }
       }
     } catch {
       alert("Hubo un error, intenta de nuevo");
@@ -170,7 +185,7 @@ export default function InvitationClient({
             )}
 
             <p className="text-lg" style={{ color: "var(--foreground)", opacity: 0.9 }}>
-              ¡Prepárate para cantar, jugar y pasarla increíble! 🎶
+              ¡Prepárate para cantar, jugar y pasarla increíble con los monstruos! 🎶👾
             </p>
           </div>
         </section>
@@ -295,7 +310,7 @@ export default function InvitationClient({
                   border: "none",
                 }}
               >
-                🎵 Voy a ir!
+                🎵 ¡Siii, voy a ir!
               </button>
 
               {!showDeclineInput ? (
@@ -382,10 +397,10 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--primary)" }}
               >
-                ¡Confirmado! ¡Te esperamos!
+                ¡Yeeei! ¡Te esperamos!
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                ¡Va a estar genial! 🎵👾🎶
+                ¡Va a ser la mejor fiesta de monstruos! 🎵👾🎶
               </p>
             </div>
           )}

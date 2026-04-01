@@ -54,6 +54,7 @@ export async function initDb() {
     ["birthday_person", "Taddeo"],
     ["party_age", "9"],
     ["admin_password", "Taddeo2026."],
+    ["admin_whatsapp", ""],
   ];
 
   for (const [key, value] of defaults) {

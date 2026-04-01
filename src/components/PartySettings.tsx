@@ -7,6 +7,7 @@ export default function PartySettings() {
     party_date: "",
     party_time: "",
     party_location: "",
+    admin_whatsapp: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -20,6 +21,7 @@ export default function PartySettings() {
           party_date: data.party_date || "",
           party_time: data.party_time || "",
           party_location: data.party_location || "",
+          admin_whatsapp: data.admin_whatsapp || "",
         });
       })
       .catch(() => {})
@@ -118,6 +120,29 @@ export default function PartySettings() {
           placeholder="Ej: Salón de Fiestas Monster, Av. Principal 123"
           className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 transition-all"
         />
+      </div>
+
+      {/* WhatsApp admin */}
+      <div>
+        <label
+          htmlFor="admin-whatsapp"
+          className="block text-sm font-medium text-foreground/70 mb-1"
+        >
+          📱 Tu WhatsApp (para recibir notificaciones)
+        </label>
+        <input
+          id="admin-whatsapp"
+          type="text"
+          value={settings.admin_whatsapp}
+          onChange={(e) =>
+            setSettings((prev) => ({ ...prev, admin_whatsapp: e.target.value }))
+          }
+          placeholder="Ej: +56912345678"
+          className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+        />
+        <p className="text-xs text-foreground/40 mt-1">
+          Cuando alguien confirme o rechace, se abrirá WhatsApp para avisarte
+        </p>
       </div>
 
       {/* Save button */}
