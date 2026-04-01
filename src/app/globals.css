@@ -152,6 +152,53 @@ body::before {
   animation: monster-bounce 2s ease-in-out infinite;
 }
 
+/* ===== Monster Image Float Animation ===== */
+@keyframes monster-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  15% {
+    transform: translateY(-8px) rotate(1.5deg) scale(1.02);
+  }
+  30% {
+    transform: translateY(-4px) rotate(-1deg) scale(1.01);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg) scale(1.03);
+  }
+  70% {
+    transform: translateY(-5px) rotate(-1.5deg) scale(1.01);
+  }
+  85% {
+    transform: translateY(-10px) rotate(1deg) scale(1.02);
+  }
+}
+
+.monster-float {
+  animation: monster-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 8px 24px rgba(126, 198, 54, 0.3));
+  transition: filter 0.3s ease;
+}
+
+.monster-float:hover {
+  filter: drop-shadow(0 12px 32px rgba(126, 198, 54, 0.5));
+}
+
+@keyframes glow-ring {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.08);
+  }
+}
+
+.monster-glow-ring {
+  animation: glow-ring 4s ease-in-out infinite;
+}
+
 /* ===== Glassmorphism Card ===== */
 .glass-card {
   background: rgba(255, 255, 255, 0.06);

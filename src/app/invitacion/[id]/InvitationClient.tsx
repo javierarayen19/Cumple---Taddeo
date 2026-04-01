@@ -443,13 +443,13 @@ export default function InvitationClient({
 
         <div className="relative z-10 flex flex-col items-center text-center px-8">
           {/* Monster image on splash */}
-          <div className="mb-4 monster-bounce">
+          <div className="mb-4 monster-float">
             <Image
               src="/monsters.png"
               alt="My Singing Monsters"
               width={200}
               height={160}
-              className="drop-shadow-2xl"
+              className="rounded-xl"
               priority
             />
           </div>
@@ -627,20 +627,22 @@ export default function InvitationClient({
             </span>
           </div>
 
-          {/* Monster image */}
+          {/* Monster image — animated */}
           <div className="flex justify-center mt-6 mb-2">
             <div className="relative">
-              <Image
-                src="/monsters.png"
-                alt="My Singing Monsters"
-                width={280}
-                height={220}
-                className="drop-shadow-2xl rounded-2xl"
-              />
-              {/* Glow behind image */}
+              <div className="monster-float">
+                <Image
+                  src="/monsters.png"
+                  alt="My Singing Monsters"
+                  width={280}
+                  height={220}
+                  className="rounded-2xl"
+                />
+              </div>
+              {/* Animated glow ring behind image */}
               <div
-                className="absolute inset-0 -z-10 blur-[40px] opacity-30 rounded-2xl"
-                style={{ background: "var(--primary)" }}
+                className="absolute inset-[-16px] -z-10 blur-[40px] rounded-3xl monster-glow-ring"
+                style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary), var(--accent-pink))" }}
               />
             </div>
           </div>
@@ -1008,7 +1010,7 @@ export default function InvitationClient({
                   minHeight: "56px",
                 }}
               >
-                🎵 ¡Siii, voy a ir!
+                🎵 ¡Confirmo mi asistencia!
               </button>
 
               {!showDeclineInput ? (
@@ -1024,7 +1026,7 @@ export default function InvitationClient({
                     minHeight: "52px",
                   }}
                 >
-                  No puedo ir 😢
+                  Lo siento, no puedo asistir 😢
                 </button>
               ) : (
                 <div className="glass-card p-4">
