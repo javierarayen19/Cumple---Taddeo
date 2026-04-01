@@ -10,7 +10,7 @@ export async function PATCH(
     await initDb();
 
     const { id } = await params;
-    const { action, decline_reason } = await request.json();
+    const { action, decline_reason, allergies } = await request.json();
 
     // Get guest name
     const guestRow = await getDb().execute({
@@ -32,9 +32,10 @@ export async function PATCH(
     const notificationEmail = (emailRow.rows[0]?.value as string) || "";
 
     if (action === "confirm") {
+      const allergiesValue = allergies?.trim() ?? "";
       await getDb().execute({
-        sql: "UPDATE guests SET confirmed = 1, declined = 0, decline_reason = '' WHERE id = ?",
-        args: [id],
+        sql: "UPDATE guests SET confirmed = 1, declined = 0, decline_reason = '', allergies = ? WHERE id = ?",
+        args: [allergiesValue, id],
       });
 
       // Send email notification

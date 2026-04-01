@@ -2,38 +2,14 @@
 
 import { useState } from "react";
 
-const ALLERGY_OPTIONS = [
-  "Ninguna",
-  "Gluten",
-  "Lactosa",
-  "Frutos Secos",
-  "Mariscos",
-  "Otra",
-];
-
 interface GuestFormProps {
   onGuestAdded: () => void;
 }
 
 export default function GuestForm({ onGuestAdded }: GuestFormProps) {
   const [name, setName] = useState("");
-  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
-  const [customAllergy, setCustomAllergy] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  function toggleAllergy(allergy: string) {
-    setSelectedAllergies((prev) => {
-      if (allergy === "Ninguna") {
-        return prev.includes("Ninguna") ? [] : ["Ninguna"];
-      }
-      const without = prev.filter((a) => a !== "Ninguna");
-      if (without.includes(allergy)) {
-        return without.filter((a) => a !== allergy);
-      }
-      return [...without, allergy];
-    });
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,16 +18,11 @@ export default function GuestForm({ onGuestAdded }: GuestFormProps) {
     setLoading(true);
     setError("");
 
-    const allergies = selectedAllergies
-      .map((a) => (a === "Otra" ? customAllergy.trim() || "Otra" : a))
-      .filter((a) => a !== "Ninguna")
-      .join(", ");
-
     try {
       const res = await fetch("/api/guests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), allergies }),
+        body: JSON.stringify({ name: name.trim(), allergies: "" }),
       });
 
       if (!res.ok) {
@@ -60,8 +31,6 @@ export default function GuestForm({ onGuestAdded }: GuestFormProps) {
       }
 
       setName("");
-      setSelectedAllergies([]);
-      setCustomAllergy("");
       onGuestAdded();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido");
@@ -92,42 +61,9 @@ export default function GuestForm({ onGuestAdded }: GuestFormProps) {
         />
       </div>
 
-      {/* Allergy chips */}
-      <div>
-        <label className="block text-sm font-medium text-foreground/70 mb-2">
-          Alergias
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {ALLERGY_OPTIONS.map((allergy) => {
-            const isActive = selectedAllergies.includes(allergy);
-            return (
-              <button
-                key={allergy}
-                type="button"
-                onClick={() => toggleAllergy(allergy)}
-                className={`px-3 py-1.5 rounded-xl text-sm font-semibold border transition-all ${
-                  isActive
-                    ? "bg-secondary/30 border-secondary text-foreground"
-                    : "bg-surface border-border text-foreground/60 hover:border-foreground/30"
-                }`}
-              >
-                {allergy}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Custom allergy input */}
-        {selectedAllergies.includes("Otra") && (
-          <input
-            type="text"
-            value={customAllergy}
-            onChange={(e) => setCustomAllergy(e.target.value)}
-            placeholder="Especifica la alergia..."
-            className="mt-3 w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
-          />
-        )}
-      </div>
+      <p className="text-xs text-foreground/40">
+        Las alergias se seleccionan en la invitación cuando el invitado confirma asistencia.
+      </p>
 
       {/* Error */}
       {error && (

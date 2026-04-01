@@ -89,6 +89,19 @@ body::before {
   animation: shimmer 4s linear infinite;
 }
 
+/* ===== Gradient text ===== */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--accent-pink) 0%,
+    var(--secondary) 50%,
+    var(--accent-yellow) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* ===== Floating Musical Notes ===== */
 @keyframes float-note {
   0% {
@@ -139,7 +152,46 @@ body::before {
   animation: monster-bounce 2s ease-in-out infinite;
 }
 
-/* ===== Glow Effects for Cards ===== */
+/* ===== Glassmorphism Card ===== */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease-out, box-shadow 0.3s ease;
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  pointer-events: none;
+}
+
+/* ===== Card tap/hover effect ===== */
+.card-tap-effect {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.card-tap-effect:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 32px rgba(126, 198, 54, 0.15);
+}
+
+.card-tap-effect:active {
+  transform: scale(0.98);
+}
+
+/* ===== Glow Effects for Cards (admin) ===== */
 .card-glow {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -181,7 +233,26 @@ body::before {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ===== Glow pulse for buttons/accents ===== */
+/* ===== Pulsing Glow for buttons ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(126, 198, 54, 0.4),
+      0 0 20px rgba(126, 198, 54, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(126, 198, 54, 0.6),
+      0 0 50px rgba(245, 166, 35, 0.3),
+      0 0 80px rgba(126, 198, 54, 0.15);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* Legacy alias */
 @keyframes glow-pulse {
   0%, 100% {
     box-shadow:
@@ -197,6 +268,103 @@ body::before {
 
 .glow-pulse {
   animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* ===== Splash screen enter button glow ===== */
+.splash-enter-btn {
+  box-shadow:
+    0 0 20px rgba(126, 198, 54, 0.4),
+    0 0 60px rgba(126, 198, 54, 0.2),
+    0 0 100px rgba(126, 198, 54, 0.1);
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease;
+}
+
+.splash-enter-btn:hover {
+  box-shadow:
+    0 0 30px rgba(126, 198, 54, 0.6),
+    0 0 80px rgba(126, 198, 54, 0.3),
+    0 0 120px rgba(245, 166, 35, 0.2);
+}
+
+/* ===== Confetti Animation ===== */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(var(--x, 20px)) rotate(var(--rotation, 720deg));
+    opacity: 0;
+  }
+}
+
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  left: var(--x, 50vw);
+  width: 10px;
+  height: 10px;
+  background: var(--color, var(--primary));
+  border-radius: 2px;
+  animation: confetti-fall 3s var(--delay, 0s) ease-out forwards;
+}
+
+.confetti-piece:nth-child(odd) {
+  width: 6px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.confetti-piece:nth-child(3n) {
+  width: 12px;
+  height: 6px;
+}
+
+/* ===== Fade Up animation (for staged reveal) ===== */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Slide in from bottom ===== */
+@keyframes slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== Allergy chips ===== */
+.allergy-chip {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.allergy-chip-active {
+  box-shadow: 0 0 12px rgba(245, 166, 35, 0.3);
+}
+
+.allergy-chip-inactive:hover {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* ===== Utility: gradient backgrounds ===== */
