@@ -39,9 +39,9 @@ function buildWhatsAppMessage(guest: Guest) {
   const url = getInvitationUrl(guest.id);
   const companionLine =
     guest.companions_count > 0
-      ? `\n\n👥 ¡Podés venir con ${guest.companions_count} acompañante${guest.companions_count > 1 ? "s" : ""}! Cuantos más, ¡mejor! 🎉`
+      ? `\n\n👥 ¡Puedes venir con ${guest.companions_count} acompañante${guest.companions_count > 1 ? "s" : ""}! Mientras más, ¡mejor! 🎉`
       : "";
-  return `🎵🎮 ¡Eyyy ${guest.name}! 🥳\n\n¡Taddeo cumple 9 y la fiesta va a estar ÉPICA! 🎂🕹️\nMúsica, juegos, torta y mucha diversión… ¡no te lo podés perder!\n\nAbrí tu invitación acá 👇\n${url}${companionLine}\n\n¡Te esperamos! 🚀👾🎵`;
+  return `🎵🎮 ¡Holaa ${guest.name}! 🥳\n\n¡Taddeo cumple 9 y la fiesta va a estar filete! 🎂🕹️\nMúsica, juegos, torta y mucha diversión… ¡no te lo puedes perder po!\n\nAbre tu invitación acá 👇\n${url}${companionLine}\n\n¡Te esperamos! 🚀👾🎵`;
 }
 
 export default function GuestList({ guests, onDelete }: GuestListProps) {

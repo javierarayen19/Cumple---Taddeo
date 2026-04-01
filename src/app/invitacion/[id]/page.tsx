@@ -27,7 +27,7 @@ export default async function InvitacionPage({ params }: Props) {
         <p className="text-xl text-[var(--foreground)]/70 max-w-md">
           Este monstruo no aparece en nuestra lista... 🎵
           <br />
-          Verifica tu enlace de invitacion!
+          ¡Verifica tu enlace de invitación!
         </p>
         <div className="mt-8 text-4xl">🎵 👾 🎶 👾 🎵</div>
       </div>

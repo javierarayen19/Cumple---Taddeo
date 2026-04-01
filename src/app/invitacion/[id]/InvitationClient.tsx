@@ -204,9 +204,9 @@ function buildGoogleCalendarUrl(date: string, time: string, location: string): s
 
       const params = new URLSearchParams({
         action: "TEMPLATE",
-        text: "Cumple de Taddeo - 9 Anos! 🎵👾",
+        text: "Cumple de Taddeo - 9 Años! 🎵👾",
         dates: `${startDate}/${endDate}`,
-        details: "Fiesta de cumpleanos de Taddeo - My Singing Monsters Party! 🎵🎮👾",
+        details: "Fiesta de cumpleaños de Taddeo - My Singing Monsters Party! 🎵🎮👾",
         location: location,
       });
 
@@ -217,7 +217,7 @@ function buildGoogleCalendarUrl(date: string, time: string, location: string): s
   // Fallback: just open Google Calendar with event title
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: "Cumple de Taddeo - 9 Anos! 🎵👾",
+    text: "Cumple de Taddeo - 9 Años! 🎵👾",
     details: `Fecha: ${date}\nHora: ${time}\nLugar: ${location}\n\nMy Singing Monsters Party! 🎵🎮👾`,
     location: location,
   });
@@ -536,7 +536,7 @@ export default function InvitationClient({
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}
-        aria-label={musicMuted ? "Activar musica" : "Silenciar musica"}
+        aria-label={musicMuted ? "Activar música" : "Silenciar música"}
       >
         <VolumeIcon muted={musicMuted} />
       </button>
@@ -590,7 +590,7 @@ export default function InvitationClient({
               className="text-lg"
               style={{ color: "var(--foreground)", opacity: 0.9 }}
             >
-              ¡Preparate para cantar, jugar y pasarla increible con los
+              ¡Prepárate para cantar, jugar y pasarla increíble con los
               monstruos! 🎶👾
             </p>
           </div>
@@ -608,7 +608,7 @@ export default function InvitationClient({
             className="text-xl font-[var(--font-body)] font-semibold tracking-wide mb-4"
             style={{ color: "var(--foreground)", opacity: 0.85 }}
           >
-            Estas invitado/a a...
+            Estás invitado/a a...
           </p>
           <h1
             className="font-[var(--font-display)] text-5xl sm:text-6xl font-bold leading-tight mb-3 msm-title"
@@ -623,7 +623,7 @@ export default function InvitationClient({
               className="text-3xl sm:text-4xl font-[var(--font-display)] font-bold msm-title"
               style={{ color: "var(--accent-yellow)" }}
             >
-              ¡Cumple 9 anos!
+              ¡Cumple 9 años!
             </span>
           </div>
 
@@ -684,7 +684,7 @@ export default function InvitationClient({
               </p>
               <div className="flex justify-center gap-3">
                 {[
-                  { value: countdown.days, label: "Dias" },
+                  { value: countdown.days, label: "Días" },
                   { value: countdown.hours, label: "Hrs" },
                   { value: countdown.minutes, label: "Min" },
                   { value: countdown.seconds, label: "Seg" },
@@ -803,7 +803,7 @@ export default function InvitationClient({
                   className="font-[var(--font-display)] text-lg font-bold"
                   style={{ color: "var(--accent-orange)" }}
                 >
-                  ¿Como llego?
+                  ¿Cómo llego?
                 </span>
                 <span className="text-sm" style={{ color: "var(--foreground)", opacity: 0.5 }}>
                   (Google Maps)
@@ -905,13 +905,13 @@ export default function InvitationClient({
                 style={{ color: "var(--primary)" }}
               >
                 <UsersIcon />
-                ¿Vienes con alguien mas?
+                ¿Vienes con alguien más?
               </h3>
               <p
                 className="text-sm mb-4"
                 style={{ color: "var(--foreground)", opacity: 0.6 }}
               >
-                Indica si te acompaña alguien (papa, mama, hermano/a...)
+                Indica si te acompaña alguien (papá, mamá, hermano/a...)
               </p>
 
               {/* Counter */}
@@ -1128,7 +1128,7 @@ export default function InvitationClient({
                   }}
                 >
                   <NavigationIcon />
-                  Ver como llegar
+                  Ver cómo llegar
                 </a>
               )}
             </div>
@@ -1141,7 +1141,7 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--accent-pink)" }}
               >
-                ¡Que pena que no puedas venir!
+                ¡Qué pena que no puedas venir!
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
                 ¡Te vamos a extrañar! 🎵
