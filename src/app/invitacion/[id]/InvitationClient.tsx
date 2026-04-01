@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { createMusicPlayer } from "@/lib/music";
 
 interface Guest {
   id: string;
@@ -115,7 +114,7 @@ export default function InvitationClient({
   const [musicMuted, setMusicMuted] = useState(false);
   const [splashPulsing, setSplashPulsing] = useState(true);
 
-  const musicRef = useRef<ReturnType<typeof createMusicPlayer> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Splash pulse animation
   useEffect(() => {
@@ -138,11 +137,13 @@ export default function InvitationClient({
   }, [entered]);
 
   const handleEnter = useCallback(() => {
-    // Start music via Web Audio API (requires user gesture)
+    // Start music with real MP3 (requires user gesture)
     try {
-      const player = createMusicPlayer();
-      player.start();
-      musicRef.current = player;
+      const audio = new Audio("/music.mp3");
+      audio.loop = true;
+      audio.volume = 0.5;
+      audio.play();
+      audioRef.current = audio;
     } catch {
       // Music is optional, continue without it
     }
@@ -150,14 +151,24 @@ export default function InvitationClient({
   }, []);
 
   const toggleMusic = useCallback(() => {
-    if (!musicRef.current) return;
+    if (!audioRef.current) return;
     if (musicMuted) {
-      musicRef.current.setVolume(0.5);
+      audioRef.current.volume = 0.5;
     } else {
-      musicRef.current.setVolume(0);
+      audioRef.current.volume = 0;
     }
     setMusicMuted(!musicMuted);
   }, [musicMuted]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   function toggleAllergy(allergy: string) {
     setSelectedAllergies((prev) => {
