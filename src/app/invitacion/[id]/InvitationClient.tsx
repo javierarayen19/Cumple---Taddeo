@@ -1033,7 +1033,7 @@ export default function InvitationClient({
                   <textarea
                     value={declineReason}
                     onChange={(e) => setDeclineReason(e.target.value)}
-                    placeholder="Cuentanos por que no puedes venir (opcional)"
+                    placeholder="Cuéntanos por qué no puedes venir (opcional)"
                     rows={3}
                     className="w-full rounded-xl p-3 mb-3 text-sm resize-none"
                     style={{
@@ -1094,45 +1094,11 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--primary)" }}
               >
-                ¡Yeeei! ¡Te esperamos!
+                ¡Gracias por confirmar! 🎉
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                ¡Va a ser la mejor fiesta de monstruos! 🎵👾🎶
+                ¡Te esperamos en la mejor fiesta de monstruos! 🎵👾🎶
               </p>
-
-              {/* Show calendar button after confirming */}
-              <a
-                href={calendarUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 cursor-pointer"
-                style={{
-                  background: "rgba(245,166,35,0.2)",
-                  border: "1px solid rgba(245,166,35,0.4)",
-                  color: "var(--secondary)",
-                }}
-              >
-                <CalendarPlusIcon />
-                Agendar en mi calendario
-              </a>
-
-              {/* Show map button if available */}
-              {partyLocationUrl && (
-                <a
-                  href={partyLocationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 cursor-pointer"
-                  style={{
-                    background: "rgba(126,198,54,0.15)",
-                    border: "1px solid rgba(126,198,54,0.3)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  <NavigationIcon />
-                  Ver cómo llegar
-                </a>
-              )}
             </div>
           )}
 
@@ -1143,10 +1109,10 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--accent-pink)" }}
               >
-                ¡Qué pena que no puedas venir!
+                Lamentamos que no puedas asistir 😢
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                ¡Te vamos a extrañar! 🎵
+                ¡Te vamos a extrañar mucho! Ojalá nos veamos pronto 🎵
               </p>
             </div>
           )}
