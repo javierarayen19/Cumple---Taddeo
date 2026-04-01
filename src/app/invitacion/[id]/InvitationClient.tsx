@@ -443,15 +443,25 @@ export default function InvitationClient({
 
         <div className="relative z-10 flex flex-col items-center text-center px-8">
           {/* Monster image on splash */}
-          <div className="mb-4 monster-float">
-            <Image
-              src="/monsters.jpg"
-              alt="My Singing Monsters"
-              width={200}
-              height={160}
-              className="rounded-xl"
-              priority
+          <div className="mb-4 monster-float relative">
+            {/* Green glow circle behind image */}
+            <div
+              className="absolute inset-[-30px] -z-10 rounded-full blur-[60px] opacity-50"
+              style={{ background: "radial-gradient(circle, var(--primary), var(--primary-dark) 50%, transparent 75%)" }}
             />
+            <div
+              className="rounded-[2rem] overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #1a3a1a, #0d1f0d)" }}
+            >
+              <Image
+                src="/monsters.jpg"
+                alt="My Singing Monsters"
+                width={220}
+                height={180}
+                className="monster-img-splash"
+                priority
+              />
+            </div>
           </div>
 
           {/* Title */}
@@ -631,18 +641,23 @@ export default function InvitationClient({
           <div className="flex justify-center mt-6 mb-2">
             <div className="relative">
               <div className="monster-float">
-                <Image
-                  src="/monsters.jpg"
-                  alt="My Singing Monsters"
-                  width={280}
-                  height={220}
-                  className="rounded-2xl"
-                />
+                <div
+                  className="rounded-[2rem] overflow-hidden"
+                  style={{ background: "linear-gradient(160deg, #1a3a1a, #2a5a2a)" }}
+                >
+                  <Image
+                    src="/monsters.jpg"
+                    alt="My Singing Monsters"
+                    width={300}
+                    height={240}
+                    className="monster-img-blend"
+                  />
+                </div>
               </div>
               {/* Animated glow ring behind image */}
               <div
-                className="absolute inset-[-16px] -z-10 blur-[40px] rounded-3xl monster-glow-ring"
-                style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary), var(--accent-pink))" }}
+                className="absolute inset-[-24px] -z-10 blur-[50px] rounded-full monster-glow-ring"
+                style={{ background: "radial-gradient(circle, var(--primary) 0%, var(--secondary) 50%, transparent 75%)" }}
               />
             </div>
           </div>
