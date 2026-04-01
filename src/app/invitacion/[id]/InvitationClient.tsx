@@ -32,6 +32,32 @@ const ALLERGY_OPTIONS = [
   { label: "Otra", icon: "📝" },
 ];
 
+// Monster images — scattered as small decorations across the page
+const MONSTER_IMAGES = [
+  "/monster1.jpg",
+  "/monster2.jpg",
+  "/monster3.jpeg",
+  "/monster4.png",
+  "/monster5.jpg",
+];
+
+// Generate random positions for scattered monsters
+function generateScatteredMonsters(count: number) {
+  const imgs = [];
+  for (let i = 0; i < count; i++) {
+    imgs.push({
+      src: MONSTER_IMAGES[i % MONSTER_IMAGES.length],
+      top: `${8 + Math.random() * 80}%`,
+      left: Math.random() > 0.5 ? `${-2 + Math.random() * 12}%` : `${78 + Math.random() * 14}%`,
+      size: 50 + Math.floor(Math.random() * 30),
+      delay: `${Math.random() * 4}s`,
+      duration: `${5 + Math.random() * 4}s`,
+      rotate: Math.floor(Math.random() * 30 - 15),
+    });
+  }
+  return imgs;
+}
+
 // Floating particles configuration
 const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
   emoji: ["🎵", "🎶", "⭐", "✨", "🎵", "🎶", "⭐", "✨", "🎵"][i % 9],
@@ -233,6 +259,7 @@ export default function InvitationClient({
   partyLocation,
   partyLocationUrl,
 }: Props) {
+  const [scatteredMonsters] = useState(() => generateScatteredMonsters(8));
   const [entered, setEntered] = useState(false);
   const [visibleSections, setVisibleSections] = useState<number[]>([]);
   const [status, setStatus] = useState<"pending" | "confirmed" | "declined">(
@@ -442,27 +469,40 @@ export default function InvitationClient({
         ))}
 
         <div className="relative z-10 flex flex-col items-center text-center px-8">
-          {/* Monster image on splash */}
-          <div className="mb-4 monster-float relative">
-            {/* Green glow circle behind image */}
+          {/* Scattered monster decorations on splash */}
+          {scatteredMonsters.slice(0, 4).map((m, i) => (
             <div
-              className="absolute inset-[-30px] -z-10 rounded-full blur-[60px] opacity-50"
-              style={{ background: "radial-gradient(circle, var(--primary), var(--primary-dark) 50%, transparent 75%)" }}
-            />
-            <div
-              className="rounded-[2rem] overflow-hidden"
-              style={{ background: "linear-gradient(135deg, #1a3a1a, #0d1f0d)" }}
+              key={i}
+              className="fixed monster-float pointer-events-none"
+              style={{
+                top: m.top,
+                left: m.left,
+                animationDelay: m.delay,
+                animationDuration: m.duration,
+                opacity: 0.45,
+                zIndex: 0,
+              }}
             >
-              <Image
-                src="/monsters.jpg"
-                alt="My Singing Monsters"
-                width={220}
-                height={180}
-                className="monster-img-splash"
-                priority
-              />
+              <div
+                className="rounded-full overflow-hidden"
+                style={{
+                  width: m.size,
+                  height: m.size,
+                  background: "rgba(26,58,26,0.9)",
+                  transform: `rotate(${m.rotate}deg)`,
+                }}
+              >
+                <Image
+                  src={m.src}
+                  alt=""
+                  width={m.size}
+                  height={m.size}
+                  className="object-cover"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             </div>
-          </div>
+          ))}
 
           {/* Title */}
           <h1
@@ -581,6 +621,41 @@ export default function InvitationClient({
         </div>
       ))}
 
+      {/* Scattered monster decorations */}
+      {scatteredMonsters.map((m, i) => (
+        <div
+          key={`monster-${i}`}
+          className="fixed monster-float pointer-events-none"
+          style={{
+            top: m.top,
+            left: m.left,
+            animationDelay: m.delay,
+            animationDuration: m.duration,
+            opacity: 0.3,
+            zIndex: 1,
+          }}
+        >
+          <div
+            className="rounded-full overflow-hidden"
+            style={{
+              width: m.size,
+              height: m.size,
+              background: "rgba(26,58,26,0.9)",
+              transform: `rotate(${m.rotate}deg)`,
+            }}
+          >
+            <Image
+              src={m.src}
+              alt=""
+              width={m.size}
+              height={m.size}
+              className="object-cover"
+              style={{ width: "100%", height: "100%" }}
+            />
+          </div>
+        </div>
+      ))}
+
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center px-4 py-8 max-w-lg mx-auto">
         {/* Section 0 — Guest greeting */}
@@ -637,29 +712,34 @@ export default function InvitationClient({
             </span>
           </div>
 
-          {/* Monster image — animated */}
-          <div className="flex justify-center mt-6 mb-2">
-            <div className="relative">
-              <div className="monster-float">
+          {/* Small monster showcase row */}
+          <div className="flex justify-center gap-5 mt-6 mb-2">
+            {MONSTER_IMAGES.sort(() => Math.random() - 0.5).slice(0, 3).map((src, i) => (
+              <div
+                key={i}
+                className="monster-float"
+                style={{ animationDelay: `${i * 0.6}s` }}
+              >
                 <div
-                  className="rounded-[2rem] overflow-hidden"
-                  style={{ background: "linear-gradient(160deg, #1a3a1a, #2a5a2a)" }}
+                  className="rounded-full overflow-hidden shadow-lg"
+                  style={{
+                    width: 70,
+                    height: 70,
+                    background: "rgba(26,58,26,0.8)",
+                    border: "2px solid rgba(126,198,54,0.25)",
+                  }}
                 >
                   <Image
-                    src="/monsters.jpg"
-                    alt="My Singing Monsters"
-                    width={300}
-                    height={240}
-                    className="monster-img-blend"
+                    src={src}
+                    alt="MSM Monster"
+                    width={70}
+                    height={70}
+                    className="object-cover"
+                    style={{ width: "100%", height: "100%" }}
                   />
                 </div>
               </div>
-              {/* Animated glow ring behind image */}
-              <div
-                className="absolute inset-[-24px] -z-10 blur-[50px] rounded-full monster-glow-ring"
-                style={{ background: "radial-gradient(circle, var(--primary) 0%, var(--secondary) 50%, transparent 75%)" }}
-              />
-            </div>
+            ))}
           </div>
 
           {/* Monster decorative row */}
