@@ -15,6 +15,8 @@ export async function GET() {
       confirmed: row.confirmed === 1,
       declined: row.declined === 1,
       decline_reason: row.decline_reason,
+      companions_count: Number(row.companions_count) || 0,
+      companions_names: row.companions_names || "",
       createdAt: row.created_at,
     }));
 

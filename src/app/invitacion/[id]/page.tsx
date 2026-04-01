@@ -13,7 +13,7 @@ export default async function InvitacionPage({ params }: Props) {
 
   // Fetch guest
   const guestRow = await getDb().execute({
-    sql: "SELECT id, name, allergies, confirmed, declined, decline_reason FROM guests WHERE id = ?",
+    sql: "SELECT id, name, allergies, confirmed, declined, decline_reason, companions_count, companions_names FROM guests WHERE id = ?",
     args: [id],
   });
 
@@ -42,11 +42,13 @@ export default async function InvitacionPage({ params }: Props) {
     confirmed: row.confirmed === 1,
     declined: row.declined === 1,
     decline_reason: (row.decline_reason as string) || "",
+    companions_count: Number(row.companions_count) || 0,
+    companions_names: (row.companions_names as string) || "",
   };
 
   // Fetch party settings
   const settingsRows = await getDb().execute(
-    "SELECT key, value FROM settings WHERE key IN ('party_date', 'party_time', 'party_location')"
+    "SELECT key, value FROM settings WHERE key IN ('party_date', 'party_time', 'party_location', 'party_location_url')"
   );
 
   const settings: Record<string, string> = {};
@@ -60,6 +62,7 @@ export default async function InvitacionPage({ params }: Props) {
       partyDate={settings.party_date || "Abril 2026"}
       partyTime={settings.party_time || "A confirmar"}
       partyLocation={settings.party_location || "A confirmar"}
+      partyLocationUrl={settings.party_location_url || ""}
     />
   );
 }

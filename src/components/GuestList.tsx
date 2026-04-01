@@ -37,7 +37,11 @@ function getInvitationUrl(guestId: string) {
 
 function buildWhatsAppMessage(guest: Guest) {
   const url = getInvitationUrl(guest.id);
-  return `🎵🎮 ¡Hola ${guest.name}! Estás invitado/a al cumple de Taddeo que cumple 9 años! 🥳🎂\n\n¡Abre tu invitación acá! 👇\n${url}\n\n¡Te esperamos! 👾🎵`;
+  const companionLine =
+    guest.companions_count > 0
+      ? `\n\n👥 ¡Podés venir con ${guest.companions_count} acompañante${guest.companions_count > 1 ? "s" : ""}! Cuantos más, ¡mejor! 🎉`
+      : "";
+  return `🎵🎮 ¡Eyyy ${guest.name}! 🥳\n\n¡Taddeo cumple 9 y la fiesta va a estar ÉPICA! 🎂🕹️\nMúsica, juegos, torta y mucha diversión… ¡no te lo podés perder!\n\nAbrí tu invitación acá 👇\n${url}${companionLine}\n\n¡Te esperamos! 🚀👾🎵`;
 }
 
 export default function GuestList({ guests, onDelete }: GuestListProps) {
@@ -108,6 +112,18 @@ export default function GuestList({ guests, onDelete }: GuestListProps) {
                     {a.trim()}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Companions */}
+            {guest.confirmed && guest.companions_count > 0 && (
+              <div className="flex items-center gap-2 text-xs text-foreground/60">
+                <span className="font-semibold text-secondary">
+                  👥 +{guest.companions_count} acompañante{guest.companions_count > 1 ? "s" : ""}
+                </span>
+                {guest.companions_names && (
+                  <span className="text-foreground/40">({guest.companions_names})</span>
+                )}
               </div>
             )}
 

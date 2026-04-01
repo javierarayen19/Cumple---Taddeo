@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 
 interface Guest {
   id: string;
@@ -9,6 +10,8 @@ interface Guest {
   confirmed: boolean;
   declined: boolean;
   decline_reason: string;
+  companions_count: number;
+  companions_names: string;
 }
 
 interface Props {
@@ -16,6 +19,7 @@ interface Props {
   partyDate: string;
   partyTime: string;
   partyLocation: string;
+  partyLocationUrl: string;
 }
 
 const ALLERGY_OPTIONS = [
@@ -37,7 +41,7 @@ const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
   size: `${1 + Math.random() * 0.8}rem`,
 }));
 
-// SVG icons for detail cards
+// --- SVG Icons ---
 function CalendarIcon() {
   return (
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -93,11 +97,141 @@ function VolumeIcon({ muted }: { muted: boolean }) {
   );
 }
 
+function NavigationIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="3 11 22 2 13 21 11 13 3 11" />
+    </svg>
+  );
+}
+
+function CalendarPlusIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="12" y1="14" x2="12" y2="18" />
+      <line x1="10" y1="16" x2="14" y2="16" />
+    </svg>
+  );
+}
+
+function UsersIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+    </svg>
+  );
+}
+
+// --- Countdown helper ---
+function getCountdown(dateStr: string): { days: number; hours: number; minutes: number; seconds: number; passed: boolean } | null {
+  // Try to parse date like "Sabado 12 de Abril 2026" or "12 de Abril 2026" or ISO
+  const months: Record<string, number> = {
+    enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+    julio: 6, agosto: 7, septiembre: 8, octubre: 9, noviembre: 10, diciembre: 11,
+  };
+
+  // Try extracting day + month + year from Spanish format
+  const match = dateStr.match(/(\d{1,2})\s+de\s+(\w+)\s+(\d{4})/i);
+  if (match) {
+    const day = parseInt(match[1]);
+    const monthName = match[2].toLowerCase();
+    const year = parseInt(match[3]);
+    const monthIndex = months[monthName];
+    if (monthIndex !== undefined) {
+      const target = new Date(year, monthIndex, day, 0, 0, 0);
+      const now = new Date();
+      const diff = target.getTime() - now.getTime();
+      if (diff < -86400000) return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: true };
+      const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+      return {
+        days: Math.floor(totalSeconds / 86400),
+        hours: Math.floor((totalSeconds % 86400) / 3600),
+        minutes: Math.floor((totalSeconds % 3600) / 60),
+        seconds: totalSeconds % 60,
+        passed: false,
+      };
+    }
+  }
+
+  // Fallback: try Date.parse
+  const parsed = Date.parse(dateStr);
+  if (!isNaN(parsed)) {
+    const diff = parsed - Date.now();
+    if (diff < -86400000) return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: true };
+    const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+    return {
+      days: Math.floor(totalSeconds / 86400),
+      hours: Math.floor((totalSeconds % 86400) / 3600),
+      minutes: Math.floor((totalSeconds % 3600) / 60),
+      seconds: totalSeconds % 60,
+      passed: false,
+    };
+  }
+
+  return null; // Cannot parse date
+}
+
+// --- Google Calendar URL builder ---
+function buildGoogleCalendarUrl(date: string, time: string, location: string): string {
+  // Try to build a proper date
+  const months: Record<string, string> = {
+    enero: "01", febrero: "02", marzo: "03", abril: "04", mayo: "05", junio: "06",
+    julio: "07", agosto: "08", septiembre: "09", octubre: "10", noviembre: "11", diciembre: "12",
+  };
+
+  let startDate = "";
+  const match = date.match(/(\d{1,2})\s+de\s+(\w+)\s+(\d{4})/i);
+  if (match) {
+    const day = match[1].padStart(2, "0");
+    const month = months[match[2].toLowerCase()] || "01";
+    const year = match[3];
+
+    // Parse time like "15:00" or "15:00 hrs"
+    const timeMatch = time.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      const hour = timeMatch[1].padStart(2, "0");
+      const min = timeMatch[2];
+      startDate = `${year}${month}${day}T${hour}${min}00`;
+      // End time: 3 hours later
+      const endHour = String(Math.min(23, parseInt(hour) + 3)).padStart(2, "0");
+      const endDate = `${year}${month}${day}T${endHour}${min}00`;
+
+      const params = new URLSearchParams({
+        action: "TEMPLATE",
+        text: "Cumple de Taddeo - 9 Anos! 🎵👾",
+        dates: `${startDate}/${endDate}`,
+        details: "Fiesta de cumpleanos de Taddeo - My Singing Monsters Party! 🎵🎮👾",
+        location: location,
+      });
+
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    }
+  }
+
+  // Fallback: just open Google Calendar with event title
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "Cumple de Taddeo - 9 Anos! 🎵👾",
+    details: `Fecha: ${date}\nHora: ${time}\nLugar: ${location}\n\nMy Singing Monsters Party! 🎵🎮👾`,
+    location: location,
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+
 export default function InvitationClient({
   guest,
   partyDate,
   partyTime,
   partyLocation,
+  partyLocationUrl,
 }: Props) {
   const [entered, setEntered] = useState(false);
   const [visibleSections, setVisibleSections] = useState<number[]>([]);
@@ -113,6 +247,11 @@ export default function InvitationClient({
   const [showConfetti, setShowConfetti] = useState(false);
   const [musicMuted, setMusicMuted] = useState(false);
   const [splashPulsing, setSplashPulsing] = useState(true);
+  const [countdown, setCountdown] = useState(getCountdown(partyDate));
+
+  // Companions state
+  const [companionsCount, setCompanionsCount] = useState(0);
+  const [companionNames, setCompanionNames] = useState<string[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -122,10 +261,18 @@ export default function InvitationClient({
     return () => clearInterval(interval);
   }, []);
 
+  // Countdown timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown(getCountdown(partyDate));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [partyDate]);
+
   // Staged reveal after entering
   useEffect(() => {
     if (!entered) return;
-    const delays = [200, 800, 1500, 2100, 2600, 3100, 3600];
+    const delays = [200, 800, 1500, 2100, 2600, 3100, 3600, 4100];
     const timers: NodeJS.Timeout[] = [];
     delays.forEach((delay, index) => {
       const timer = setTimeout(() => {
@@ -137,7 +284,6 @@ export default function InvitationClient({
   }, [entered]);
 
   const handleEnter = useCallback(() => {
-    // Start music with real MP3 (requires user gesture)
     try {
       const audio = new Audio("/music.mp3");
       audio.loop = true;
@@ -145,7 +291,7 @@ export default function InvitationClient({
       audio.play();
       audioRef.current = audio;
     } catch {
-      // Music is optional, continue without it
+      // Music is optional
     }
     setEntered(true);
   }, []);
@@ -183,6 +329,24 @@ export default function InvitationClient({
     });
   }
 
+  function updateCompanionsCount(count: number) {
+    const newCount = Math.max(0, Math.min(10, count));
+    setCompanionsCount(newCount);
+    setCompanionNames((prev) => {
+      const arr = [...prev];
+      while (arr.length < newCount) arr.push("");
+      return arr.slice(0, newCount);
+    });
+  }
+
+  function updateCompanionName(index: number, name: string) {
+    setCompanionNames((prev) => {
+      const arr = [...prev];
+      arr[index] = name;
+      return arr;
+    });
+  }
+
   const handleConfirm = async () => {
     setIsSubmitting(true);
     try {
@@ -194,7 +358,12 @@ export default function InvitationClient({
       const res = await fetch(`/api/guests/${guest.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "confirm", allergies }),
+        body: JSON.stringify({
+          action: "confirm",
+          allergies,
+          companions_count: companionsCount,
+          companions_names: companionNames.filter((n) => n.trim()).join(", "),
+        }),
       });
       if (res.ok) {
         setStatus("confirmed");
@@ -236,6 +405,8 @@ export default function InvitationClient({
 
   const isVisible = (section: number) => visibleSections.includes(section);
 
+  const calendarUrl = buildGoogleCalendarUrl(partyDate, partyTime, partyLocation);
+
   // --- SPLASH SCREEN ---
   if (!entered) {
     return (
@@ -243,7 +414,7 @@ export default function InvitationClient({
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ background: "#0a0a0a" }}
       >
-        {/* Subtle background glow */}
+        {/* Background glows */}
         <div
           className="absolute w-[300px] h-[300px] rounded-full opacity-20 blur-[100px]"
           style={{ background: "var(--primary)" }}
@@ -253,7 +424,7 @@ export default function InvitationClient({
           style={{ background: "var(--accent-pink)" }}
         />
 
-        {/* Floating particles on splash */}
+        {/* Floating particles */}
         {PARTICLES.slice(0, 8).map((p, i) => (
           <div
             key={i}
@@ -271,8 +442,17 @@ export default function InvitationClient({
         ))}
 
         <div className="relative z-10 flex flex-col items-center text-center px-8">
-          {/* Monster emoji */}
-          <div className="text-7xl mb-6 monster-bounce">👾</div>
+          {/* Monster image on splash */}
+          <div className="mb-4 monster-bounce">
+            <Image
+              src="/monsters.png"
+              alt="My Singing Monsters"
+              width={200}
+              height={160}
+              className="drop-shadow-2xl"
+              priority
+            />
+          </div>
 
           {/* Title */}
           <h1
@@ -356,7 +536,7 @@ export default function InvitationClient({
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}
-        aria-label={musicMuted ? "Activar música" : "Silenciar música"}
+        aria-label={musicMuted ? "Activar musica" : "Silenciar musica"}
       >
         <VolumeIcon muted={musicMuted} />
       </button>
@@ -403,22 +583,20 @@ export default function InvitationClient({
         >
           <div className="glass-card p-6">
             <div className="text-5xl mb-3 monster-bounce">🥳</div>
-            <h2
-              className="font-[var(--font-display)] text-3xl sm:text-4xl font-bold mb-3 gradient-text"
-            >
+            <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl font-bold mb-3 gradient-text">
               Hola {guest.name}!
             </h2>
             <p
               className="text-lg"
               style={{ color: "var(--foreground)", opacity: 0.9 }}
             >
-              ¡Prepárate para cantar, jugar y pasarla increíble con los
+              ¡Preparate para cantar, jugar y pasarla increible con los
               monstruos! 🎶👾
             </p>
           </div>
         </section>
 
-        {/* Section 1 — Title */}
+        {/* Section 1 — Title + Monster image */}
         <section
           className={`w-full text-center mb-8 transition-all duration-700 ease-out ${
             isVisible(1)
@@ -430,7 +608,7 @@ export default function InvitationClient({
             className="text-xl font-[var(--font-body)] font-semibold tracking-wide mb-4"
             style={{ color: "var(--foreground)", opacity: 0.85 }}
           >
-            Estás invitado/a a...
+            Estas invitado/a a...
           </p>
           <h1
             className="font-[var(--font-display)] text-5xl sm:text-6xl font-bold leading-tight mb-3 msm-title"
@@ -445,42 +623,49 @@ export default function InvitationClient({
               className="text-3xl sm:text-4xl font-[var(--font-display)] font-bold msm-title"
               style={{ color: "var(--accent-yellow)" }}
             >
-              ¡Cumple 9 años!
+              ¡Cumple 9 anos!
             </span>
           </div>
+
+          {/* Monster image */}
+          <div className="flex justify-center mt-6 mb-2">
+            <div className="relative">
+              <Image
+                src="/monsters.png"
+                alt="My Singing Monsters"
+                width={280}
+                height={220}
+                className="drop-shadow-2xl rounded-2xl"
+              />
+              {/* Glow behind image */}
+              <div
+                className="absolute inset-0 -z-10 blur-[40px] opacity-30 rounded-2xl"
+                style={{ background: "var(--primary)" }}
+              />
+            </div>
+          </div>
+
           {/* Monster decorative row */}
           <div className="flex justify-center gap-3 mt-4 text-3xl">
             <span className="monster-bounce" style={{ animationDelay: "0s" }}>
               👾
             </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.2s" }}
-            >
+            <span className="monster-bounce" style={{ animationDelay: "0.2s" }}>
               🎸
             </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.4s" }}
-            >
+            <span className="monster-bounce" style={{ animationDelay: "0.4s" }}>
               🎤
             </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.6s" }}
-            >
+            <span className="monster-bounce" style={{ animationDelay: "0.6s" }}>
               🎮
             </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.8s" }}
-            >
+            <span className="monster-bounce" style={{ animationDelay: "0.8s" }}>
               👾
             </span>
           </div>
         </section>
 
-        {/* Section 2 — Party details */}
+        {/* Section 2 — Party details + Countdown */}
         <section
           className={`w-full mb-8 transition-all duration-700 ease-out ${
             isVisible(2)
@@ -488,6 +673,64 @@ export default function InvitationClient({
               : "opacity-0 translate-y-8"
           }`}
         >
+          {/* Countdown timer */}
+          {countdown && !countdown.passed && (
+            <div className="glass-card p-5 mb-4 text-center">
+              <p
+                className="text-sm font-semibold uppercase tracking-wider mb-3"
+                style={{ color: "var(--accent-pink)" }}
+              >
+                Cuenta regresiva
+              </p>
+              <div className="flex justify-center gap-3">
+                {[
+                  { value: countdown.days, label: "Dias" },
+                  { value: countdown.hours, label: "Hrs" },
+                  { value: countdown.minutes, label: "Min" },
+                  { value: countdown.seconds, label: "Seg" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex flex-col items-center"
+                  >
+                    <div
+                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-[var(--font-display)] font-bold"
+                      style={{
+                        background: "rgba(126,198,54,0.15)",
+                        border: "1px solid rgba(126,198,54,0.3)",
+                        color: "var(--accent-lime)",
+                      }}
+                    >
+                      {String(item.value).padStart(2, "0")}
+                    </div>
+                    <span
+                      className="text-xs mt-1 font-semibold"
+                      style={{ color: "var(--foreground)", opacity: 0.5 }}
+                    >
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add to Calendar button */}
+              <a
+                href={calendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 cursor-pointer"
+                style={{
+                  background: "rgba(245,166,35,0.2)",
+                  border: "1px solid rgba(245,166,35,0.4)",
+                  color: "var(--secondary)",
+                }}
+              >
+                <CalendarPlusIcon />
+                Agendar en mi calendario
+              </a>
+            </div>
+          )}
+
           <div className="flex flex-col gap-4">
             {/* Date card */}
             <div className="glass-card p-5 flex items-center gap-4 card-tap-effect">
@@ -530,7 +773,7 @@ export default function InvitationClient({
               <div className="flex-shrink-0">
                 <MapPinIcon />
               </div>
-              <div>
+              <div className="flex-1">
                 <p
                   className="text-sm font-semibold uppercase tracking-wider"
                   style={{ color: "var(--accent-orange)" }}
@@ -542,6 +785,31 @@ export default function InvitationClient({
                 </p>
               </div>
             </div>
+
+            {/* Google Maps button */}
+            {partyLocationUrl && (
+              <a
+                href={partyLocationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-card p-4 flex items-center justify-center gap-3 card-tap-effect cursor-pointer transition-all duration-200 active:scale-[0.97]"
+                style={{
+                  background: "rgba(245,166,35,0.1)",
+                  border: "1px solid rgba(245,166,35,0.3)",
+                }}
+              >
+                <NavigationIcon />
+                <span
+                  className="font-[var(--font-display)] text-lg font-bold"
+                  style={{ color: "var(--accent-orange)" }}
+                >
+                  ¿Como llego?
+                </span>
+                <span className="text-sm" style={{ color: "var(--foreground)", opacity: 0.5 }}>
+                  (Google Maps)
+                </span>
+              </a>
+            )}
           </div>
         </section>
 
@@ -622,10 +890,106 @@ export default function InvitationClient({
           </section>
         )}
 
-        {/* Section 4 — RSVP buttons */}
+        {/* Section 4 — Companions (only when pending) */}
+        {status === "pending" && (
+          <section
+            className={`w-full mb-8 transition-all duration-700 ease-out ${
+              isVisible(4)
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            <div className="glass-card p-6">
+              <h3
+                className="font-[var(--font-display)] text-xl font-bold mb-1 flex items-center gap-2"
+                style={{ color: "var(--primary)" }}
+              >
+                <UsersIcon />
+                ¿Vienes con alguien mas?
+              </h3>
+              <p
+                className="text-sm mb-4"
+                style={{ color: "var(--foreground)", opacity: 0.6 }}
+              >
+                Indica si te acompaña alguien (papa, mama, hermano/a...)
+              </p>
+
+              {/* Counter */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <button
+                  type="button"
+                  onClick={() => updateCompanionsCount(companionsCount - 1)}
+                  disabled={companionsCount <= 0}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-200 active:scale-90 cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  -
+                </button>
+                <div
+                  className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-[var(--font-display)] font-bold"
+                  style={{
+                    background: "rgba(126,198,54,0.15)",
+                    border: "1px solid rgba(126,198,54,0.3)",
+                    color: "var(--accent-lime)",
+                  }}
+                >
+                  {companionsCount}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateCompanionsCount(companionsCount + 1)}
+                  disabled={companionsCount >= 10}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-200 active:scale-90 cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Companion name inputs */}
+              {companionsCount > 0 && (
+                <div className="space-y-3">
+                  <p
+                    className="text-sm font-semibold"
+                    style={{ color: "var(--foreground)", opacity: 0.7 }}
+                  >
+                    Nombre de tus acompañantes:
+                  </p>
+                  {Array.from({ length: companionsCount }).map((_, i) => (
+                    <input
+                      key={i}
+                      type="text"
+                      value={companionNames[i] || ""}
+                      onChange={(e) => updateCompanionName(i, e.target.value)}
+                      placeholder={`Acompañante ${i + 1}`}
+                      className="w-full rounded-xl px-4 py-3 text-sm transition-all duration-200"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid var(--border)",
+                        color: "var(--foreground)",
+                        outline: "none",
+                        minHeight: "44px",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Section 5 — RSVP buttons */}
         <section
           className={`w-full mb-8 transition-all duration-700 ease-out ${
-            isVisible(4)
+            isVisible(5)
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-8"
           }`}
@@ -663,13 +1027,11 @@ export default function InvitationClient({
                   No puedo ir 😢
                 </button>
               ) : (
-                <div
-                  className="glass-card p-4"
-                >
+                <div className="glass-card p-4">
                   <textarea
                     value={declineReason}
                     onChange={(e) => setDeclineReason(e.target.value)}
-                    placeholder="Cuéntanos por qué no puedes venir (opcional)"
+                    placeholder="Cuentanos por que no puedes venir (opcional)"
                     rows={3}
                     className="w-full rounded-xl p-3 mb-3 text-sm resize-none"
                     style={{
@@ -716,36 +1078,11 @@ export default function InvitationClient({
               <div className="text-5xl mb-3">
                 {justConfirmed ? (
                   <span className="inline-flex gap-2">
-                    <span
-                      className="monster-bounce"
-                      style={{ animationDelay: "0s" }}
-                    >
-                      🎉
-                    </span>
-                    <span
-                      className="monster-bounce"
-                      style={{ animationDelay: "0.15s" }}
-                    >
-                      🥳
-                    </span>
-                    <span
-                      className="monster-bounce"
-                      style={{ animationDelay: "0.3s" }}
-                    >
-                      🎊
-                    </span>
-                    <span
-                      className="monster-bounce"
-                      style={{ animationDelay: "0.45s" }}
-                    >
-                      ⭐
-                    </span>
-                    <span
-                      className="monster-bounce"
-                      style={{ animationDelay: "0.6s" }}
-                    >
-                      🎵
-                    </span>
+                    <span className="monster-bounce" style={{ animationDelay: "0s" }}>🎉</span>
+                    <span className="monster-bounce" style={{ animationDelay: "0.15s" }}>🥳</span>
+                    <span className="monster-bounce" style={{ animationDelay: "0.3s" }}>🎊</span>
+                    <span className="monster-bounce" style={{ animationDelay: "0.45s" }}>⭐</span>
+                    <span className="monster-bounce" style={{ animationDelay: "0.6s" }}>🎵</span>
                   </span>
                 ) : (
                   "🎉"
@@ -760,6 +1097,40 @@ export default function InvitationClient({
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
                 ¡Va a ser la mejor fiesta de monstruos! 🎵👾🎶
               </p>
+
+              {/* Show calendar button after confirming */}
+              <a
+                href={calendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 cursor-pointer"
+                style={{
+                  background: "rgba(245,166,35,0.2)",
+                  border: "1px solid rgba(245,166,35,0.4)",
+                  color: "var(--secondary)",
+                }}
+              >
+                <CalendarPlusIcon />
+                Agendar en mi calendario
+              </a>
+
+              {/* Show map button if available */}
+              {partyLocationUrl && (
+                <a
+                  href={partyLocationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 cursor-pointer"
+                  style={{
+                    background: "rgba(126,198,54,0.15)",
+                    border: "1px solid rgba(126,198,54,0.3)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <NavigationIcon />
+                  Ver como llegar
+                </a>
+              )}
             </div>
           )}
 
@@ -770,7 +1141,7 @@ export default function InvitationClient({
                 className="font-[var(--font-display)] text-2xl font-bold mb-2"
                 style={{ color: "var(--accent-pink)" }}
               >
-                ¡Qué pena que no puedas venir!
+                ¡Que pena que no puedas venir!
               </h3>
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>
                 ¡Te vamos a extrañar! 🎵
@@ -779,42 +1150,20 @@ export default function InvitationClient({
           )}
         </section>
 
-        {/* Section 5 — Footer */}
+        {/* Section 6 — Footer */}
         <section
           className={`w-full text-center mt-4 mb-8 transition-all duration-700 ease-out ${
-            isVisible(5)
+            isVisible(6)
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-8"
           }`}
         >
           <div className="flex justify-center gap-2 text-2xl mb-3">
-            <span className="monster-bounce" style={{ animationDelay: "0s" }}>
-              🎵
-            </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.3s" }}
-            >
-              👾
-            </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.6s" }}
-            >
-              🎶
-            </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "0.9s" }}
-            >
-              👾
-            </span>
-            <span
-              className="monster-bounce"
-              style={{ animationDelay: "1.2s" }}
-            >
-              🎵
-            </span>
+            <span className="monster-bounce" style={{ animationDelay: "0s" }}>🎵</span>
+            <span className="monster-bounce" style={{ animationDelay: "0.3s" }}>👾</span>
+            <span className="monster-bounce" style={{ animationDelay: "0.6s" }}>🎶</span>
+            <span className="monster-bounce" style={{ animationDelay: "0.9s" }}>👾</span>
+            <span className="monster-bounce" style={{ animationDelay: "1.2s" }}>🎵</span>
           </div>
           <p
             className="font-[var(--font-display)] text-lg font-semibold"

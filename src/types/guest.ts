@@ -5,5 +5,7 @@ export interface Guest {
   confirmed: boolean;
   declined: boolean;
   decline_reason: string;
+  companions_count: number;
+  companions_names: string;
   createdAt: string;
 }

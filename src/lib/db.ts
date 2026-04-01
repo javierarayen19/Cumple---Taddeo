@@ -34,9 +34,15 @@ export async function initDb() {
       confirmed   INTEGER NOT NULL DEFAULT 0,
       declined    INTEGER NOT NULL DEFAULT 0,
       decline_reason TEXT NOT NULL DEFAULT '',
+      companions_count INTEGER NOT NULL DEFAULT 0,
+      companions_names TEXT NOT NULL DEFAULT '',
       created_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `);
+
+  // Migrate existing databases that lack the new columns
+  try { await db.execute("ALTER TABLE guests ADD COLUMN companions_count INTEGER NOT NULL DEFAULT 0"); } catch {}
+  try { await db.execute("ALTER TABLE guests ADD COLUMN companions_names TEXT NOT NULL DEFAULT ''"); } catch {}
 
   await db.execute(`
     CREATE TABLE IF NOT EXISTS settings (
@@ -55,6 +61,7 @@ export async function initDb() {
     ["party_age", "9"],
     ["admin_password", "Taddeo2026."],
     ["admin_whatsapp", ""],
+    ["party_location_url", ""],
   ];
 
   for (const [key, value] of defaults) {

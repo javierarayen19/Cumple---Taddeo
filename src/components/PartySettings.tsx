@@ -7,6 +7,7 @@ export default function PartySettings() {
     party_date: "",
     party_time: "",
     party_location: "",
+    party_location_url: "",
     notification_email: "",
   });
   const [loading, setLoading] = useState(true);
@@ -21,6 +22,7 @@ export default function PartySettings() {
           party_date: data.party_date || "",
           party_time: data.party_time || "",
           party_location: data.party_location || "",
+          party_location_url: data.party_location_url || "",
           notification_email: data.notification_email || "",
         });
       })
@@ -120,6 +122,29 @@ export default function PartySettings() {
           placeholder="Ej: Salón de Fiestas Monster, Av. Principal 123"
           className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 transition-all"
         />
+      </div>
+
+      {/* URL del Mapa */}
+      <div>
+        <label
+          htmlFor="party-location-url"
+          className="block text-sm font-medium text-foreground/70 mb-1"
+        >
+          🗺️ URL de Google Maps
+        </label>
+        <input
+          id="party-location-url"
+          type="url"
+          value={settings.party_location_url}
+          onChange={(e) =>
+            setSettings((prev) => ({ ...prev, party_location_url: e.target.value }))
+          }
+          placeholder="Ej: https://maps.google.com/..."
+          className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 transition-all"
+        />
+        <p className="text-xs text-foreground/40 mt-1">
+          Pega el enlace de Google Maps para que los invitados puedan ver cómo llegar
+        </p>
       </div>
 
       {/* Email notificaciones */}
