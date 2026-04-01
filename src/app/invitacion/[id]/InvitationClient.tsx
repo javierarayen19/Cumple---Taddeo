@@ -445,7 +445,7 @@ export default function InvitationClient({
           {/* Monster image on splash */}
           <div className="mb-4 monster-float">
             <Image
-              src="/monsters.png"
+              src="/monsters.jpg"
               alt="My Singing Monsters"
               width={200}
               height={160}
@@ -632,7 +632,7 @@ export default function InvitationClient({
             <div className="relative">
               <div className="monster-float">
                 <Image
-                  src="/monsters.png"
+                  src="/monsters.jpg"
                   alt="My Singing Monsters"
                   width={280}
                   height={220}
