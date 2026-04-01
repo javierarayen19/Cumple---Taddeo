@@ -1,4 +1,5 @@
 import { getDb, initDb } from "@/lib/db";
+import { sendNotificationEmail } from "@/lib/email";
 
 // PATCH — confirm or decline a guest
 export async function PATCH(
@@ -11,7 +12,7 @@ export async function PATCH(
     const { id } = await params;
     const { action, decline_reason } = await request.json();
 
-    // Get guest name for notification
+    // Get guest name
     const guestRow = await getDb().execute({
       sql: "SELECT name FROM guests WHERE id = ?",
       args: [id],
@@ -23,12 +24,12 @@ export async function PATCH(
 
     const guestName = guestRow.rows[0].name as string;
 
-    // Get admin whatsapp number
-    const waRow = await getDb().execute({
-      sql: "SELECT value FROM settings WHERE key = 'admin_whatsapp'",
+    // Get notification email
+    const emailRow = await getDb().execute({
+      sql: "SELECT value FROM settings WHERE key = 'notification_email'",
       args: [],
     });
-    const adminWhatsapp = (waRow.rows[0]?.value as string) || "";
+    const notificationEmail = (emailRow.rows[0]?.value as string) || "";
 
     if (action === "confirm") {
       await getDb().execute({
@@ -36,15 +37,16 @@ export async function PATCH(
         args: [id],
       });
 
-      // Build WhatsApp notification URL
-      let whatsappUrl = "";
-      if (adminWhatsapp) {
-        const phone = adminWhatsapp.replace(/\D/g, "");
-        const msg = `🎉 ¡${guestName} confirmó que va al cumple de Taddeo! 🥳👾🎵`;
-        whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      // Send email notification
+      if (notificationEmail) {
+        await sendNotificationEmail({
+          to: notificationEmail,
+          guestName,
+          action: "confirmed",
+        });
       }
 
-      return Response.json({ success: true, action: "confirmed", whatsappUrl });
+      return Response.json({ success: true, action: "confirmed" });
     }
 
     if (action === "decline") {
@@ -53,15 +55,17 @@ export async function PATCH(
         args: [decline_reason?.trim() ?? "", id],
       });
 
-      let whatsappUrl = "";
-      if (adminWhatsapp) {
-        const phone = adminWhatsapp.replace(/\D/g, "");
-        const reason = decline_reason?.trim() ? ` Motivo: ${decline_reason.trim()}` : "";
-        const msg = `😢 ${guestName} no puede ir al cumple de Taddeo.${reason}`;
-        whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      // Send email notification
+      if (notificationEmail) {
+        await sendNotificationEmail({
+          to: notificationEmail,
+          guestName,
+          action: "declined",
+          reason: decline_reason?.trim(),
+        });
       }
 
-      return Response.json({ success: true, action: "declined", whatsappUrl });
+      return Response.json({ success: true, action: "declined" });
     }
 
     return Response.json(

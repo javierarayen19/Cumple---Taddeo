@@ -62,13 +62,6 @@ export default function InvitationClient({
     return () => timers.forEach((t) => clearTimeout(t));
   }, []);
 
-  const sendWhatsAppNotification = (whatsappUrl: string) => {
-    if (whatsappUrl) {
-      // Open WhatsApp in new tab to send notification to admin
-      window.open(whatsappUrl, "_blank");
-    }
-  };
-
   const handleConfirm = async () => {
     setIsSubmitting(true);
     try {
@@ -78,12 +71,8 @@ export default function InvitationClient({
         body: JSON.stringify({ action: "confirm" }),
       });
       if (res.ok) {
-        const data = await res.json();
         setStatus("confirmed");
         setJustConfirmed(true);
-        if (data.whatsappUrl) {
-          sendWhatsAppNotification(data.whatsappUrl);
-        }
       }
     } catch {
       alert("Hubo un error, intenta de nuevo");
@@ -105,11 +94,7 @@ export default function InvitationClient({
         body: JSON.stringify({ action: "decline", decline_reason: declineReason }),
       });
       if (res.ok) {
-        const data = await res.json();
         setStatus("declined");
-        if (data.whatsappUrl) {
-          sendWhatsAppNotification(data.whatsappUrl);
-        }
       }
     } catch {
       alert("Hubo un error, intenta de nuevo");

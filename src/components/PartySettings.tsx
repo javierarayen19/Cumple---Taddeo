@@ -7,7 +7,7 @@ export default function PartySettings() {
     party_date: "",
     party_time: "",
     party_location: "",
-    admin_whatsapp: "",
+    notification_email: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,7 +21,7 @@ export default function PartySettings() {
           party_date: data.party_date || "",
           party_time: data.party_time || "",
           party_location: data.party_location || "",
-          admin_whatsapp: data.admin_whatsapp || "",
+          notification_email: data.notification_email || "",
         });
       })
       .catch(() => {})
@@ -122,26 +122,26 @@ export default function PartySettings() {
         />
       </div>
 
-      {/* WhatsApp admin */}
+      {/* Email notificaciones */}
       <div>
         <label
-          htmlFor="admin-whatsapp"
+          htmlFor="notification-email"
           className="block text-sm font-medium text-foreground/70 mb-1"
         >
-          📱 Tu WhatsApp (para recibir notificaciones)
+          📧 Email para notificaciones
         </label>
         <input
-          id="admin-whatsapp"
-          type="text"
-          value={settings.admin_whatsapp}
+          id="notification-email"
+          type="email"
+          value={settings.notification_email}
           onChange={(e) =>
-            setSettings((prev) => ({ ...prev, admin_whatsapp: e.target.value }))
+            setSettings((prev) => ({ ...prev, notification_email: e.target.value }))
           }
-          placeholder="Ej: +56912345678"
+          placeholder="Ej: tucorreo@gmail.com"
           className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
         />
         <p className="text-xs text-foreground/40 mt-1">
-          Cuando alguien confirme o rechace, se abrirá WhatsApp para avisarte
+          Te llegará un correo cada vez que alguien confirme o rechace la invitación
         </p>
       </div>
 
