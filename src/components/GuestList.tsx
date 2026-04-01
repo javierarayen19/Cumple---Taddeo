@@ -37,11 +37,22 @@ function getInvitationUrl(guestId: string) {
 
 function buildWhatsAppMessage(guest: Guest) {
   const url = getInvitationUrl(guest.id);
-  const companionLine =
-    guest.companions_count > 0
-      ? `\n\n👥 ¡Puedes venir con ${guest.companions_count} acompañante${guest.companions_count > 1 ? "s" : ""}! Mientras más, ¡mejor! 🎉`
-      : "";
-  return `🎵🎮 ¡Holaa ${guest.name}! 🥳\n\n¡Taddeo cumple 9 y la fiesta va a estar filete! 🎂🕹️\nMúsica, juegos, torta y mucha diversión… ¡no te lo puedes perder po!\n\nAbre tu invitación acá 👇\n${url}${companionLine}\n\n¡Te esperamos! 🚀👾🎵`;
+  return `🎉🎵 *¡Holaa ${guest.name}!* 🥳🎮
+
+👾 *¡Taddeo cumple 9 años!* 👾
+🎂 ¡Y estás invitado/a a la fiesta más filete del año! 🕹️
+
+🎤 Música
+🎮 Juegos
+🍰 Torta
+🎵 ¡My Singing Monsters Party!
+
+👇 *Abre tu invitación acá:*
+${url}
+
+📌 *Confirma tu asistencia en el enlace* para que podamos preparar todo 🎶
+
+🚀 ¡No te lo puedes perder po! 👾🎵`;
 }
 
 export default function GuestList({ guests, onDelete }: GuestListProps) {
@@ -134,7 +145,22 @@ export default function GuestList({ guests, onDelete }: GuestListProps) {
               </p>
             )}
 
-            {/* Action buttons */}
+            {/* WhatsApp button — always visible and prominent */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full rounded-xl px-4 py-2.5 text-sm font-bold transition-all active:scale-[0.97]"
+              style={{
+                background: "linear-gradient(135deg, #25d366, #128c7e)",
+                color: "#fff",
+                border: "none",
+              }}
+            >
+              💬 Enviar invitación por WhatsApp
+            </a>
+
+            {/* Secondary action buttons */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Copy invitation link */}
               <button
@@ -148,16 +174,6 @@ export default function GuestList({ guests, onDelete }: GuestListProps) {
               >
                 {isCopied ? "✅ ¡Copiado!" : "🔗 Copiar enlace"}
               </button>
-
-              {/* WhatsApp send invitation */}
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground/70 hover:border-primary hover:text-primary transition-all"
-              >
-                💬 Enviar por WhatsApp
-              </a>
 
               {/* Delete */}
               <button
